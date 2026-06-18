@@ -203,7 +203,7 @@
             const formattedDate = (new Date(selectedDate - tzOffset)).toISOString().slice(0, 16);
 
             submitBtn.disabled = true;
-            submitBtn.innerText = "구글 시트에 통신 중...";
+            submitBtn.innerText = "통신 중...";
 
             try {
                 const response = await fetch(SPREADSHEET_API_URL, {
