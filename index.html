@@ -38,6 +38,42 @@
         }
         .add-form { background-color: #f8f9fa; border: 1px solid #e9ecef; border-radius: 10px; padding: 12px; margin-bottom: 1.5rem; text-align: left; }
       
+        .add-form-details {
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+
+        .toggle-title {
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between; 
+            align-items: center;
+            padding: 4px 0;
+            user-select: none;
+        }
+
+        .add-form-details > summary::-webkit-details-marker {
+            display: none;
+        }
+        .add-form-details > summary {
+            list-style: none;
+        }
+
+        .toggle-icon {
+            font-size: 0.65rem;
+            color: #868e96;
+            transition: transform 0.2s ease;
+        }
+
+        .add-form-details[open] .toggle-icon {
+            transform: rotate(180deg);
+            color: #3b5bdb;
+        }
+
+        .add-form-details[open] .add-form {
+            margin-top: 0.5rem;
+            margin-bottom: 0; 
+        }
         .form-row { display: flex; gap: 8px; margin-bottom: 8px; width: 100%; }
         .form-row input[type="text"] { flex: 2; width: 0; padding: 8px 10px; border: 1px solid #ced4da; border-radius: 6px; font-size: 0.85rem; }
         .form-row input[type="datetime-local"] { flex: 5; width: 0; padding: 8px 10px; border: 1px solid #ced4da; border-radius: 6px; font-size: 0.85rem; }
@@ -70,14 +106,20 @@
             <span class="loading-text">일정을 가져오는 중...</span>
         </div>
 
-        <div class="section-title">✨ 새 일정 추가</div>
-        <div class="add-form">
-            <div class="form-row">
-                <input type="text" id="newLabel" placeholder="일정 이름">
-                <input type="datetime-local" id="newDateTime">
+        <details class="add-form-details">
+            <summary class="section-title toggle-title">
+                <span>✨ 새 일정 추가</span>
+                <span class="toggle-icon">▼</span>
+            </summary>
+            
+            <div class="add-form">
+                <div class="form-row">
+                    <input type="text" id="newLabel" placeholder="일정 이름">
+                    <input type="datetime-local" id="newDateTime">
+                </div>
+                <button class="submit-btn" id="submitBtn" onclick="addDateToSheet()">저장하기</button>
             </div>
-            <button class="submit-btn" id="submitBtn" onclick="addDateToSheet()">저장하기</button>
-        </div>
+        </details>
 
         <div class="section-title">📅 목표 날짜 상세 조정</div>
         <div class="main-input-group">
