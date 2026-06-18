@@ -5,142 +5,56 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>몇시간 남았을까요</title>
     <style>
-        *, *::before, *::after {
-            box-sizing: border-box;
-        }
-
+        *, *::before, *::after { box-sizing: border-box; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: #f4f6f9;
-            color: #333333;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            padding: 20px;
+            background-color: #f4f6f9; color: #333333;
+            display: flex; justify-content: center; align-items: center;
+            min-height: 100vh; margin: 0; padding: 20px;
         }
-
         .container {
-            background-color: #ffffff;
-            padding: 2.5rem;
-            border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-            text-align: center;
-            width: 100%;
-            max-width: 480px;
+            background-color: #ffffff; padding: 2.5rem; border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08); text-align: center;
+            width: 100%; max-width: 480px;
         }
-
-        h1 {
-            font-size: 1.6rem;
-            font-weight: 700;
-            margin-top: 0;
-            margin-bottom: 0.5rem;
-            letter-spacing: -0.5px;
-            color: #1a1a1a;
-        }
-
-        .current-time {
-            font-size: 0.9rem;
-            color: #868e96;
-            margin-bottom: 1.5rem;
-        }
-
-        /* 퀵 버튼 섹션 */
-        .quick-buttons-label {
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: #495057;
-            text-align: left;
-            margin-bottom: 0.5rem;
-        }
-
+        h1 { font-size: 1.6rem; font-weight: 700; margin: 0 0 0.5rem 0; color: #1a1a1a; }
+        .current-time { font-size: 0.9rem; color: #868e96; margin-bottom: 1.5rem; }
+        .section-title { font-size: 0.85rem; font-weight: 600; color: #495057; text-align: left; margin-bottom: 0.5rem; }
         .quick-buttons-container {
-            display: block;
-            text-align: left;
-            margin-bottom: 1.5rem;
-            max-height: 120px;
-            overflow-y: auto;
-            padding: 4px;
-            border: 1px dashed #dee2e6;
-            border-radius: 8px;
-            background-color: #fafafa;
+            display: block; text-align: left; margin-bottom: 1.5rem; max-height: 130px;
+            overflow-y: auto; padding: 6px; border: 1px dashed #dee2e6; border-radius: 8px; background-color: #fafafa;
         }
-
+        .quick-btn-wrapper { display: inline-block; position: relative; margin: 4px; }
         .quick-btn {
-            display: inline-block;
-            background-color: #e9ecef;
-            color: #495057;
-            border: none;
-            padding: 6px 12px;
-            margin: 4px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s ease;
+            background-color: #e9ecef; color: #495057; border: none; padding: 6px 12px;
+            border-radius: 20px; font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: all 0.2s;
         }
-
-        .quick-btn:hover {
-            background-color: #3b5bdb;
-            color: #ffffff;
+        .quick-btn:hover { background-color: #3b5bdb; color: #ffffff; }
+        .delete-btn {
+            background-color: #ff6b6b; color: white; border: none; border-radius: 50%;
+            width: 16px; height: 16px; font-size: 10px; cursor: pointer;
+            position: absolute; top: -4px; right: -4px;
+            display: flex; align-items: center; justify-content: center; padding: 0;
         }
-
-        .input-group {
-            display: flex;
-            margin-bottom: 2rem;
+        .add-form { background-color: #f8f9fa; border: 1px solid #e9ecef; border-radius: 10px; padding: 12px; margin-bottom: 1.5rem; text-align: left; }
+        .form-row { display: flex; gap: 8px; margin-bottom: 8px; width: 100%;}
+        .form-row input[type="text"] { flex: 2; width: 0; padding: 8px 10px; border: 1px solid #ced4da; border-radius: 6px; font-size: 0.85rem; }
+        .form-row input[type="datetime-local"] { flex: 5; width: 0; padding: 8px 10px; border: 1px solid #ced4da; border-radius: 6px; font-size: 0.85rem; }
+        .submit-btn {
+            width: 100%; background-color: #4c6ef5; color: white; border: none; padding: 8px;
+            border-radius: 6px; font-size: 0.85rem; font-weight: 600; cursor: pointer;
         }
-
-        input[type="datetime-local"] {
-            width: 100%;
-            padding: 12px 14px;
-            border: 2px solid #dee2e6;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-family: inherit;
-            outline: none;
-            transition: border-color 0.2s;
+        .submit-btn:disabled { background-color: #adb5bd; cursor: not-allowed; }
+        .main-input-group { margin-bottom: 2rem; }
+        .main-input-group input[type="datetime-local"] {
+            width: 100%; padding: 12px 14px; border: 2px solid #dee2e6; border-radius: 8px; font-size: 1rem; outline: none;
         }
-
-        input[type="datetime-local"]:focus {
-            border-color: #3b5bdb;
-        }
-
-        .result-box {
-            background-color: #edf2ff;
-            padding: 2rem 1rem;
-            border-radius: 12px;
-            min-height: 110px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            border: 1px solid #d0bfff;
-        }
-
-        .hours-display {
-            font-size: 2.4rem;
-            font-weight: 800;
-            color: #3b5bdb;
-            line-height: 1.2;
-        }
-
-        .unit {
-            font-size: 1rem;
-            font-weight: 600;
-            color: #495057;
-            margin-top: 0.5rem;
-        }
-
-        .message {
-            color: #868e96;
-            font-size: 0.95rem;
-        }
-
-        .loading-text {
-            font-size: 0.85rem;
-            color: #adb5bd;
-            font-style: italic;
-        }
+        .main-input-group input[type="datetime-local"]:focus { border-color: #3b5bdb; }
+        .result-box { background-color: #edf2ff; padding: 2rem 1rem; border-radius: 12px; min-height: 110px; display: flex; flex-direction: column; justify-content: center; border: 1px solid #d0bfff; }
+        .hours-display { font-size: 2.4rem; font-weight: 800; color: #3b5bdb; line-height: 1.2; }
+        .unit { font-size: 1rem; font-weight: 600; color: #495057; margin-top: 0.5rem; }
+        .message { color: #868e96; font-size: 0.95rem; }
+        .loading-text { font-size: 0.85rem; color: #adb5bd; font-style: italic; }
     </style>
 </head>
 <body>
@@ -149,18 +63,25 @@
         <h1>⏳ TIME LEFT</h1>
         <div class="current-time" id="currentTime">현재 시간: 로딩 중...</div>
 
-        <!-- 퀵 버튼 영역 -->
-        <div class="quick-buttons-label">📍 주요 일정 바로 선택</div>
+        <div class="section-title">📍 주요 일정 바로 선택</div>
         <div class="quick-buttons-container" id="quickButtons">
-            <span class="loading-text">일정을 불러오는 중...</span>
+            <span class="loading-text">일정을 가져오는 중...</span>
         </div>
 
-        <!-- 목표 날짜 입력창 -->
-        <div class="input-group">
+        <div class="section-title">✨ 새 일정 추가</div>
+        <div class="add-form">
+            <div class="form-row">
+                <input type="text" id="newLabel" placeholder="일정 이름">
+                <input type="datetime-local" id="newDateTime">
+            </div>
+            <button class="submit-btn" id="submitBtn" onclick="addDateToSheet()">저장하기</button>
+        </div>
+
+        <div class="section-title">📅 목표 날짜 상세 조정</div>
+        <div class="main-input-group">
             <input type="datetime-local" id="targetDate" onchange="startTimer()">
         </div>
 
-        <!-- 결과 출력 레이아웃 -->
         <div class="result-box">
             <div id="resultContainer">
                 <div class="message">날짜를 선택해주세요.</div>
@@ -170,23 +91,21 @@
 
     <script>
         let timerInterval = null;
+        
+        // ⚠️여기에 1단계에서 재배포 완료한 구글 웹앱 URL을 입력하세요!
+        const SPREADSHEET_API_URL = "https://script.google.com/macros/s/AKfycbwj4ufpiAHihD5Zlv4rVZEev62Qxhkm5yLMsHsUpCg6drTpzElaiaGIGhPoVtlE-cLS2w/exec";
 
-        const SPREADSHEET_API_URL = "https://script.google.com/macros/s/AKfycbzZRpiFVPyubDJ54imyI2XFXPx_Qz3FrRAoya0quaaMXUb1PdWQOvtR-DiE4BHLKQgX2g/exec";
-
-        async function loadSpecialDates() {
+        // 1. 구글 시트에서 일정 목록 조회 (GET)
+        async function fetchDates() {
             const btnContainer = document.getElementById('quickButtons');
             
             try {
-                if (SPREADSHEET_API_URL !== "YOUR_APPS_SCRIPT_WEB_APP_URL_HERE") {
-                    const response = await fetch(SPREADSHEET_API_URL);
-                    const datesList = await response.json();
-                    renderQuickButtons(datesList);
-                } else {
-                    console.log("Apps Script URL이 지정되지 않았습니다.");
-                }
+                const response = await fetch(SPREADSHEET_API_URL);
+                const dates = await response.json();
+                renderQuickButtons(dates);
             } catch (error) {
-                console.error("데이터 로드 실패:", error);
-                btnContainer.innerHTML = '<span class="loading-text" style="color:#fa5252;">일정을 불러오지 못했습니다.</span>';
+                console.error(error);
+                btnContainer.innerHTML = '<span class="loading-text" style="color:#fa5252;">데이터 로드 실패</span>';
             }
         }
 
@@ -200,56 +119,119 @@
             }
 
             dates.forEach(item => {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'quick-btn-wrapper';
+
                 const btn = document.createElement('button');
                 btn.className = 'quick-btn';
                 btn.innerText = item.name;
                 btn.onclick = () => setTargetDate(item.date);
-                btnContainer.appendChild(btn);
+                wrapper.appendChild(btn);
+
+                // 모든 일정 우측 상단에 삭제 버튼 추가
+                const delBtn = document.createElement('button');
+                delBtn.className = 'delete-btn';
+                delBtn.innerText = '×';
+                delBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    if(confirm(`'${item.name}' 일정을 삭제하시겠습니까?`)) {
+                        deleteDateFromSheet(item.id);
+                    }
+                };
+                wrapper.appendChild(delBtn);
+                btnContainer.appendChild(wrapper);
             });
         }
 
+        async function addDateToSheet() {
+            const labelInput = document.getElementById('newLabel');
+            const dateInput = document.getElementById('newDateTime');
+            const submitBtn = document.getElementById('submitBtn');
+
+            if (!labelInput.value.trim() || !dateInput.value) {
+                alert("이름과 시간을 모두 입력해 주세요.");
+                return;
+            }
+
+            // 10분 단위 보정 규칙 적용
+            const selectedDate = new Date(dateInput.value);
+            const minutes = selectedDate.getMinutes();
+            const roundedMinutes = Math.ceil(minutes / 10) * 10;
+            selectedDate.setMinutes(roundedMinutes);
+            selectedDate.setSeconds(0);
+            
+            const tzOffset = selectedDate.getTimezoneOffset() * 60000;
+            const formattedDate = (new Date(selectedDate - tzOffset)).toISOString().slice(0, 16);
+
+            submitBtn.disabled = true;
+            submitBtn.innerText = "통신 중...";
+
+            try {
+                await fetch(SPREADSHEET_API_URL, {
+                    method: "POST",
+                    contentType: "application/json",
+                    body: JSON.stringify({
+                        action: "add",
+                        name: labelInput.value.trim(),
+                        date: formattedDate
+                    })
+                });
+                labelInput.value = '';
+                dateInput.value = '';
+                await fetchDates(); // 목록 갱신
+            } catch (error) {
+                alert("추가 실패: " + error);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerText = "저장하기";
+            }
+        }
+
+        // 3. 구글 시트에서 일정 삭제 요청 (POST - action:"delete")
+        async function deleteDateFromSheet(id) {
+            try {
+                await fetch(SPREADSHEET_API_URL, {
+                    method: "POST",
+                    contentType: "application/json",
+                    body: JSON.stringify({
+                        action: "delete",
+                        id: id
+                    })
+                });
+                await fetchDates(); // 목록 갱신
+            } catch (error) {
+                alert("삭제 실패: " + error);
+            }
+        }
+
+        // 4. 타이머 기본 연산 파트
         function setTargetDate(dateTimeStr) {
-            const targetInput = document.getElementById('targetDate');
-            targetInput.value = dateTimeStr;
+            document.getElementById('targetDate').value = dateTimeStr;
             startTimer();
         }
 
         function updateCurrentTime() {
             const now = new Date();
-            const yyyy = now.getFullYear();
-            const mm = String(now.getMonth() + 1).padStart(2, '0');
-            const dd = String(now.getDate()).padStart(2, '0');
-            const hh = String(now.getHours()).padStart(2, '0');
-            const min = String(now.getMinutes()).padStart(2, '0');
-            const ss = String(now.getSeconds()).padStart(2, '0');
-            
-            document.getElementById('currentTime').innerText = `현재 시간: ${yyyy}-${mm}-${dd} ${hh}:${min}:${ss}`;
+            document.getElementById('currentTime').innerText = `현재 시간: ${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}`;
         }
         
         setInterval(updateCurrentTime, 1000);
         updateCurrentTime();
-        loadSpecialDates();
+        fetchDates(); // 첫 로드시 데이터 연동
 
         function calculateHours() {
             const targetInput = document.getElementById('targetDate').value;
             const resultContainer = document.getElementById('resultContainer');
-
             if (!targetInput) return;
 
-            const now = new Date();
-            const target = new Date(targetInput);
-            const diffMs = target - now;
-
+            const diffMs = new Date(targetInput) - new Date();
             if (diffMs <= 0) {
                 resultContainer.innerHTML = `<div class="message" style="color: #fa5252; font-weight:600;">이미 지나간 일정입니다.</div>`;
                 clearInterval(timerInterval);
                 return;
             }
-
-            const totalHours = diffMs / (1000 * 60 * 60);
-
             resultContainer.innerHTML = `
-                <div class="hours-display">${totalHours.toFixed(2)} 시간</div>
+                <div class="hours-display">${(diffMs / (1000 * 60 * 60)).toFixed(2)} 시간</div>
                 <div class="unit">남았습니다</div>
             `;
         }
@@ -259,14 +241,11 @@
             if (!targetInput.value) return;
 
             const selectedDate = new Date(targetInput.value);
-            const minutes = selectedDate.getMinutes();
-            const roundedMinutes = Math.ceil(minutes / 10) * 10;
-            selectedDate.setMinutes(roundedMinutes);
+            selectedDate.setMinutes(Math.ceil(selectedDate.getMinutes() / 10) * 10);
             selectedDate.setSeconds(0);
 
             const tzOffset = selectedDate.getTimezoneOffset() * 60000;
-            const localISOTime = (new Date(selectedDate - tzOffset)).toISOString().slice(0, 16);
-            targetInput.value = localISOTime;
+            targetInput.value = (new Date(selectedDate - tzOffset)).toISOString().slice(0, 16);
 
             if (timerInterval) clearInterval(timerInterval);
             calculateHours(); 
