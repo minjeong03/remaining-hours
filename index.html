@@ -3,85 +3,130 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>심플 남은 시간 계산기</title>
+    <title>몇시간 남았을까요</title>
     <style>
-        /* 깔끔하고 현대적인 미니멀리즘 스타일 */
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: #f8f9fa;
-            color: #212529;
+            background-color: #f4f6f9;
+            color: #333333;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
             margin: 0;
+            padding: 20px;
         }
 
         .container {
             background-color: #ffffff;
             padding: 2.5rem;
             border-radius: 16px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
             text-align: center;
             width: 100%;
-            max-width: 400px;
+            max-width: 480px;
         }
 
         h1 {
-            font-size: 1.5rem;
+            font-size: 1.6rem;
             font-weight: 700;
             margin-top: 0;
             margin-bottom: 0.5rem;
             letter-spacing: -0.5px;
+            color: #1a1a1a;
         }
 
         .current-time {
             font-size: 0.9rem;
             color: #868e96;
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        /* 퀵 버튼 섹션 */
+        .quick-buttons-label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #495057;
+            text-align: left;
+            margin-bottom: 0.5rem;
+        }
+
+        .quick-buttons-container {
+            display: block;
+            text-align: left;
+            margin-bottom: 1.5rem;
+            max-height: 120px;
+            overflow-y: auto;
+            padding: 4px;
+            border: 1px dashed #dee2e6;
+            border-radius: 8px;
+            background-color: #fafafa;
+        }
+
+        .quick-btn {
+            display: inline-block;
+            background-color: #e9ecef;
+            color: #495057;
+            border: none;
+            padding: 6px 12px;
+            margin: 4px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .quick-btn:hover {
+            background-color: #3b5bdb;
+            color: #ffffff;
         }
 
         .input-group {
             display: flex;
-            gap: 8px;
-            margin-bottom: 2.5rem;
+            margin-bottom: 2rem;
         }
 
         input[type="datetime-local"] {
-            flex: 1;
-            padding: 10px 14px;
-            border: 1px solid #dee2e6;
+            width: 100%;
+            padding: 12px 14px;
+            border: 2px solid #dee2e6;
             border-radius: 8px;
-            font-size: 0.95rem;
+            font-size: 1rem;
             font-family: inherit;
             outline: none;
             transition: border-color 0.2s;
         }
 
         input[type="datetime-local"]:focus {
-            border-color: #495057;
+            border-color: #3b5bdb;
         }
 
         .result-box {
-            background-color: #f1f3f5;
+            background-color: #edf2ff;
             padding: 2rem 1rem;
             border-radius: 12px;
-            min-height: 100px;
+            min-height: 110px;
             display: flex;
             flex-direction: column;
             justify-content: center;
+            border: 1px solid #d0bfff;
         }
 
         .hours-display {
-            font-size: 2.2rem;
+            font-size: 2.4rem;
             font-weight: 800;
-            color: #228be6; /* 포인트를 줄 깔끔한 블루 톤 */
+            color: #3b5bdb;
             line-height: 1.2;
         }
 
         .unit {
             font-size: 1rem;
-            font-weight: 500;
+            font-weight: 600;
             color: #495057;
             margin-top: 0.5rem;
         }
@@ -89,6 +134,12 @@
         .message {
             color: #868e96;
             font-size: 0.95rem;
+        }
+
+        .loading-text {
+            font-size: 0.85rem;
+            color: #adb5bd;
+            font-style: italic;
         }
     </style>
 </head>
@@ -98,6 +149,12 @@
         <h1>⏳ TIME LEFT</h1>
         <div class="current-time" id="currentTime">현재 시간: 로딩 중...</div>
 
+        <!-- 퀵 버튼 영역 -->
+        <div class="quick-buttons-label">📍 주요 일정 바로 선택</div>
+        <div class="quick-buttons-container" id="quickButtons">
+            <span class="loading-text">일정을 불러오는 중...</span>
+        </div>
+
         <!-- 목표 날짜 입력창 -->
         <div class="input-group">
             <input type="datetime-local" id="targetDate" onchange="startTimer()">
@@ -106,7 +163,7 @@
         <!-- 결과 출력 레이아웃 -->
         <div class="result-box">
             <div id="resultContainer">
-                <div class="message">목표 날짜와 시간을 선택해주세요.</div>
+                <div class="message">날짜를 선택해주세요.</div>
             </div>
         </div>
     </div>
@@ -114,7 +171,49 @@
     <script>
         let timerInterval = null;
 
-        // 1. 현재 시간을 실시간(초 단위)으로 상단에 업데이트
+        const SPREADSHEET_API_URL = "https://script.google.com/macros/s/AKfycbzZRpiFVPyubDJ54imyI2XFXPx_Qz3FrRAoya0quaaMXUb1PdWQOvtR-DiE4BHLKQgX2g/exec";
+
+        async function loadSpecialDates() {
+            const btnContainer = document.getElementById('quickButtons');
+            
+            try {
+                if (SPREADSHEET_API_URL !== "YOUR_APPS_SCRIPT_WEB_APP_URL_HERE") {
+                    const response = await fetch(SPREADSHEET_API_URL);
+                    const datesList = await response.json();
+                    renderQuickButtons(datesList);
+                } else {
+                    console.log("Apps Script URL이 지정되지 않았습니다.");
+                }
+            } catch (error) {
+                console.error("데이터 로드 실패:", error);
+                btnContainer.innerHTML = '<span class="loading-text" style="color:#fa5252;">일정을 불러오지 못했습니다.</span>';
+            }
+        }
+
+        function renderQuickButtons(dates) {
+            const btnContainer = document.getElementById('quickButtons');
+            btnContainer.innerHTML = '';
+
+            if (dates.length === 0) {
+                btnContainer.innerHTML = '<span class="loading-text">등록된 일정이 없습니다.</span>';
+                return;
+            }
+
+            dates.forEach(item => {
+                const btn = document.createElement('button');
+                btn.className = 'quick-btn';
+                btn.innerText = item.name;
+                btn.onclick = () => setTargetDate(item.date);
+                btnContainer.appendChild(btn);
+            });
+        }
+
+        function setTargetDate(dateTimeStr) {
+            const targetInput = document.getElementById('targetDate');
+            targetInput.value = dateTimeStr;
+            startTimer();
+        }
+
         function updateCurrentTime() {
             const now = new Date();
             const yyyy = now.getFullYear();
@@ -128,9 +227,9 @@
         }
         
         setInterval(updateCurrentTime, 1000);
-        updateCurrentTime(); // 최초 실행
+        updateCurrentTime();
+        loadSpecialDates();
 
-        // 2. 무조건 '시간(Hours)' 단위로만 남은 시간 계산하는 로직
         function calculateHours() {
             const targetInput = document.getElementById('targetDate').value;
             const resultContainer = document.getElementById('resultContainer');
@@ -139,31 +238,39 @@
 
             const now = new Date();
             const target = new Date(targetInput);
-            
-            // 두 날짜의 차이를 밀리초(ms) 단위로 계산
             const diffMs = target - now;
 
             if (diffMs <= 0) {
-                resultContainer.innerHTML = `<div class="message" style="color: #fa5252;">이미 지나간 날짜입니다.</div>`;
+                resultContainer.innerHTML = `<div class="message" style="color: #fa5252; font-weight:600;">이미 지나간 일정입니다.</div>`;
                 clearInterval(timerInterval);
                 return;
             }
 
-            // 밀리초를 '총 시간' 소수점으로 변환 (1초 = 1000ms, 1시간 = 3600초)
             const totalHours = diffMs / (1000 * 60 * 60);
 
-            // UI 업데이트 (소수점 둘째 자리까지 표시)
             resultContainer.innerHTML = `
                 <div class="hours-display">${totalHours.toFixed(2)} 시간</div>
                 <div class="unit">남았습니다</div>
             `;
         }
 
-        // 3. 인풋 값이 바뀌면 실시간 타이머 가동
         function startTimer() {
+            const targetInput = document.getElementById('targetDate');
+            if (!targetInput.value) return;
+
+            const selectedDate = new Date(targetInput.value);
+            const minutes = selectedDate.getMinutes();
+            const roundedMinutes = Math.ceil(minutes / 10) * 10;
+            selectedDate.setMinutes(roundedMinutes);
+            selectedDate.setSeconds(0);
+
+            const tzOffset = selectedDate.getTimezoneOffset() * 60000;
+            const localISOTime = (new Date(selectedDate - tzOffset)).toISOString().slice(0, 16);
+            targetInput.value = localISOTime;
+
             if (timerInterval) clearInterval(timerInterval);
-            calculateHours(); // 즉시 한 번 실행
-            timerInterval = setInterval(calculateHours, 100); // 0.1초마다 부드럽게 갱신
+            calculateHours(); 
+            timerInterval = setInterval(calculateHours, 100); 
         }
     </script>
 </body>
