@@ -93,6 +93,35 @@
         .unit { font-size: 1rem; font-weight: 600; color: #495057; margin-top: 0.5rem; }
         .message { color: #868e96; font-size: 0.95rem; }
         .loading-text { font-size: 0.85rem; color: #adb5bd; font-style: italic; }
+		
+		.floating-heart {
+    position: fixed;
+    bottom: -100px;
+    background-color: #ff6b6b;
+    clip-path: path('M12,5 C12,5 10,1 6,1 C2.5,1 0,3.5 0,7 C0,11.5 5.5,15 12,23 C18.5,15 24,11.5 24,7 C24,3.5 21.5,1 18,1 C14,1 12,5 12,5 Z');
+    width: 24px;
+    height: 24px;
+    opacity: 0.6;
+    cursor: pointer;
+    z-index: 1000;
+    user-select: none;
+}
+
+/* 애니메이션: 위로 올라가며 흔들리기 */
+@keyframes floatUpAndSway {
+    0% {
+        bottom: -100px;
+        transform: translateX(0) rotate(0deg);
+        opacity: 0;
+    }
+    10% {
+        opacity: 0.6;
+    }
+    100% {
+        bottom: 110vh; /* 화면 상단 위까지 */
+        /* 무작위 흔들림과 회전을 위해 나중에 자바스크립트에서 설정 */
+    }
+}
     </style>
 </head>
 <body>
@@ -324,6 +353,74 @@
             calculateHours(); 
             timerInterval = setInterval(calculateHours, 100); 
         }
+		
+function createFloatingHeart() {
+    const heart = document.createElement('div');
+    heart.className = 'floating-heart';
+    
+    // 무작위 속성 설정
+    const randomLeft = Math.random() * 95;
+    const randomSize = 1 + Math.random() * 1.5;
+    const randomDuration = 8 + Math.random() * 14;
+    const randomSway = (Math.random() - 0.5) * 100;
+    const randomRotate = (Math.random() - 0.5) * 40;
+    
+    heart.style.left = `${randomLeft}%`;
+    
+    const uniqueKeyframeName = `sway-${Math.floor(Math.random() * 100000)}`;
+    const styleSheet = document.styleSheets[0];
+    const keyframes = `@keyframes ${uniqueKeyframeName} {
+        0% { bottom: -100px; transform: scale(${randomSize}) translateX(0px) rotate(0deg); opacity: 0; }
+        10% { opacity: 0.8; }
+        100% { bottom: 110vh; transform: scale(${randomSize}) translateX(${randomSway}px) rotate(${randomRotate}deg); opacity: 0.6; }
+    }`;
+	
+    styleSheet.insertRule(keyframes, styleSheet.cssRules.length);
+    
+    heart.style.animation = `${uniqueKeyframeName} ${randomDuration}s linear forwards`;
+    
+    heart.onclick = function() {
+    const computedStyle = window.getComputedStyle(heart);
+    const currentTransform = computedStyle.transform;
+    const currentOpacity = computedStyle.opacity;
+    const currentBottom = computedStyle.bottom;
+
+    heart.style.animation = 'none';
+	
+    heart.style.transform = currentTransform;
+    heart.style.opacity = currentOpacity;
+	heart.style.bottom = currentBottom;
+	
+    setTimeout(() => {
+        heart.style.transition = 'all 0.4s ease';
+        heart.style.opacity = '1';
+        heart.style.transform = `${currentTransform} scale(1.5)`;
+		setTimeout(()=>{
+			heart.style.opacity = '0';
+			heart.style.transform = `${currentTransform} scale(0.1)`;
+		}, 500);
+    }, 1000);
+};
+    
+    document.body.appendChild(heart);
+    
+    setTimeout(() => {
+        if (heart.parentNode) {
+            heart.remove();
+            for (let i = 0; i < styleSheet.cssRules.length; i++) {
+                if (styleSheet.cssRules[i].name === uniqueKeyframeName) {
+                    styleSheet.deleteRule(i);
+                    break;
+                }
+            }
+        }
+    }, randomDuration * 1000);
+}
+
+function startHeartRain() {
+    setInterval(createFloatingHeart, 1500); 
+}
+startHeartRain();
     </script>
 </body>
 </html>
